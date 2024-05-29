@@ -7,7 +7,7 @@ public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long TicketId;
+    private Long ticketId;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private User user;
@@ -73,8 +73,12 @@ public class Ticket {
         this.section = section;
     }
 
+    public void setTicketId(Long ticketId) {
+        this.ticketId = ticketId;
+    }
+
     public Long getTicketId() {
-        return TicketId;
+        return ticketId;
     }
 
     public User getUser() {

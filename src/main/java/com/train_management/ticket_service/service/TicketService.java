@@ -46,8 +46,8 @@ public class TicketService {
         return availableSeats;
     }
 
-    private Integer allocateSeat(){
-        if(availableSeats().size()==0){
+    public Integer allocateSeat(){
+        if(availableSeats().isEmpty()){
             throw new CustomException("No seat left to allocate");
         }
         return  availableSeats().get(0);
@@ -67,7 +67,7 @@ public class TicketService {
         }
     }
 
-    private String allocateSection() {
+    public String allocateSection() {
 
         long ticketsSold = ticketRepository.count();
 
