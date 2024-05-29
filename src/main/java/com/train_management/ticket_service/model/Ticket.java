@@ -1,9 +1,6 @@
 package com.train_management.ticket_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Ticket {
@@ -12,19 +9,20 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long TicketId;
 
+    @ManyToOne(cascade = CascadeType.ALL)
     private User user;
 
     private String fromLocation;
 
     private String toLocation;
 
-    private float pricePaid;
+    private Float pricePaid;
 
-    private int seatNo;
+    private Long seatNo;
 
     private String section;
 
-    public Ticket(User user, String fromLocation, String toLocation, float pricePaid, int seatNo, String section) {
+    public Ticket(User user, String fromLocation, String toLocation, Float pricePaid, Long seatNo, String section) {
         this.user = user;
         this.fromLocation = fromLocation;
         this.toLocation = toLocation;
@@ -33,11 +31,13 @@ public class Ticket {
         this.section = section;
     }
 
-    public String getFrom() {
+    public Ticket(){}
+
+    public String getFromLocation() {
         return fromLocation;
     }
 
-    public void setFrom(String from) {
+    public void setFromLocation(String from) {
         this.fromLocation = from;
     }
 
@@ -57,11 +57,11 @@ public class Ticket {
         this.pricePaid = pricePaid;
     }
 
-    public int getSeatNo() {
+    public Long getSeatNo() {
         return seatNo;
     }
 
-    public void setSeatNo(int seatNo) {
+    public void setSeatNo(Long seatNo) {
         this.seatNo = seatNo;
     }
 
