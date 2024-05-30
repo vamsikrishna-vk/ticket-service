@@ -18,11 +18,11 @@ public class Ticket {
 
     private Float pricePaid;
 
-    private Long seatNo;
+    private Integer seatNo;
 
     private String section;
 
-    public Ticket(User user, String fromLocation, String toLocation, Float pricePaid, Long seatNo, String section) {
+    public Ticket(User user, String fromLocation, String toLocation, Float pricePaid, Integer seatNo, String section) {
         this.user = user;
         this.fromLocation = fromLocation;
         this.toLocation = toLocation;
@@ -57,11 +57,11 @@ public class Ticket {
         this.pricePaid = pricePaid;
     }
 
-    public Long getSeatNo() {
+    public int getSeatNo() {
         return seatNo;
     }
 
-    public void setSeatNo(Long seatNo) {
+    public void setSeatNo(Integer seatNo) {
         this.seatNo = seatNo;
     }
 

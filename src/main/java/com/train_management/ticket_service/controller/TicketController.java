@@ -2,6 +2,7 @@ package com.train_management.ticket_service.controller;
 
 import com.train_management.ticket_service.model.Ticket;
 import com.train_management.ticket_service.service.TicketService;
+import org.hibernate.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class TicketController {
     }
 
     @PutMapping("updateSeat")
-    public Map<String,String> updateSeat(Long ticketId, Integer seatNo){
+    public Map<String,String> updateSeat(@RequestParam Long ticketId, @RequestParam Integer seatNo){
         ticketService.modifySeat(seatNo,ticketId);
         var response = new HashMap<String,String>();
         response.put("message","seat updated Successfully.");

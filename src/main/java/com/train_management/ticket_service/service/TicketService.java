@@ -17,11 +17,15 @@ public class TicketService {
     @Autowired
     TicketRepository ticketRepository;
 
-    public static final int sectionSize = 5;
+    public static final int SECTION_SIZE = 5;
+    public static final int NUM_SECTIONS = 2;
+    public static final int TRAIN_CAPACITY = SECTION_SIZE * NUM_SECTIONS;
 
     public Ticket purchaseTicket(Ticket ticket){
-            ticket.setSection(allocateSection());
-            ticket.setSeatNo(Long.valueOf(allocateSeat()));
+
+        ticket.setSeatNo(allocateSeat());
+        ticket.setSection(generateSectionStr(ticket.getSeatNo()));
+
         return ticketRepository.save(ticket);
     }
 
@@ -39,7 +43,7 @@ public class TicketService {
     public List<Integer> availableSeats(){
         List<Integer> bookedSeats = ticketRepository.findAllSeatNo();
         List<Integer> availableSeats = IntStream.iterate(1, n -> n + 1)
-                .limit(10)
+                .limit(TRAIN_CAPACITY)
                 .filter(n -> !bookedSeats.contains(n))
                 .boxed()
                 .collect(Collectors.toList());
@@ -55,29 +59,21 @@ public class TicketService {
     @Transactional
     public void modifySeat(Integer seatNo,long ticketId){
         if(availableSeats().contains(seatNo)){
-            ticketRepository.updateSeatNo(ticketId,seatNo);
-            if(seatNo<=sectionSize){
-                ticketRepository.updateSection(ticketId,"Section A");
-                return;
+
+            int updateSeatNo = ticketRepository.updateSeatNo(ticketId,seatNo);
+            if(updateSeatNo==0){
+                throw new CustomException("Ticket not found");
             }
-            ticketRepository.updateSection(ticketId,"Section B");
+            String sectionName = generateSectionStr(seatNo);
+            ticketRepository.updateSection(ticketId,sectionName);
         }
         else {
             throw new CustomException("seat already booked");
         }
     }
 
-    public String allocateSection() {
-
-        long ticketsSold = ticketRepository.count();
-
-        if(ticketsSold < sectionSize){
-            return "Section A";
-        }
-        else if(ticketsSold >= sectionSize && ticketsSold < sectionSize*2){
-            return "Section B";
-        }else{
-            throw new CustomException("Train is full");
-        }
+    public String generateSectionStr(int seatNo){
+        int sectionNumber = (seatNo-1) / SECTION_SIZE;
+        return "Section " + (char) ('A' + sectionNumber);
     }
 }

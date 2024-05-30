@@ -59,16 +59,4 @@ public class TicketServiceTest {
     }
 
 
-    @Test
-    void testAllocateSection() {
-        when(ticketRepository.count()).thenReturn(4L);
-        assertEquals("Section A", ticketService.allocateSection());
-
-        when(ticketRepository.count()).thenReturn(5L);
-        assertEquals("Section B", ticketService.allocateSection());
-
-        when(ticketRepository.count()).thenReturn(12L);
-        assertThrows(CustomException.class, () -> ticketService.allocateSection());
-    }
-
 }
