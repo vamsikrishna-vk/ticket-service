@@ -21,6 +21,9 @@ public class TicketService {
     public static final int NUM_SECTIONS = 2;
     public static final int TRAIN_CAPACITY = SECTION_SIZE * NUM_SECTIONS;
 
+    /**
+     * Allocates Seat,Section and saves the Ticket to ticket table.
+     */
     public Ticket purchaseTicket(Ticket ticket){
 
         ticket.setSeatNo(allocateSeat());
@@ -29,37 +32,61 @@ public class TicketService {
         return ticketRepository.save(ticket);
     }
 
-    public Ticket viewTicket(Long id){
-        return ticketRepository.findById(id).orElseThrow(()-> new CustomException("ticket not found"));
+    /**
+     * Retrieve's ticket from DB by id.
+     */
+    public Ticket viewTicket(Long id) {
+        return ticketRepository.findById(id).orElseThrow(()-> new CustomException("Ticket not found"));
     }
 
+    /**
+     * Retrieve's tickets from DB by section.
+     */
     public List<Ticket> ticketsBySection(String section){
         return ticketRepository.findBySection(section);
     }
+
+    /**
+     * remove's a ticket by the ticket id.
+     */
     public void cancelTicket(Long id){
         ticketRepository.deleteById(id);
     }
 
+    /**
+     * Returns a list of available seats.
+     */
     public List<Integer> availableSeats(){
+
         List<Integer> bookedSeats = ticketRepository.findAllSeatNo();
         List<Integer> availableSeats = IntStream.iterate(1, n -> n + 1)
                 .limit(TRAIN_CAPACITY)
                 .filter(n -> !bookedSeats.contains(n))
                 .boxed()
                 .collect(Collectors.toList());
+
         return availableSeats;
     }
 
+    /**
+     * Returns next available seat.
+     */
     public Integer allocateSeat(){
+
         if(availableSeats().isEmpty()){
             throw new CustomException("No seat left to allocate");
         }
+
         return  availableSeats().get(0);
     }
+
+    /**
+     * Modifies the seatNo and changes the section according to the seatNo.
+     */
     @Transactional
     public void modifySeat(Integer seatNo,long ticketId){
-        if(availableSeats().contains(seatNo)){
 
+        if(availableSeats().contains(seatNo)){
             int updateSeatNo = ticketRepository.updateSeatNo(ticketId,seatNo);
             if(updateSeatNo==0){
                 throw new CustomException("Ticket not found");
@@ -72,8 +99,13 @@ public class TicketService {
         }
     }
 
+    /**
+     * Returns Section String based on seatNo
+     */
     public String generateSectionStr(int seatNo){
+
         int sectionNumber = (seatNo-1) / SECTION_SIZE;
+
         return "Section " + (char) ('A' + sectionNumber);
     }
 }

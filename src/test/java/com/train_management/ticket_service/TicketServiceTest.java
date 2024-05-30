@@ -35,27 +35,57 @@ public class TicketServiceTest {
 
         when(ticketRepository.save(ticket)).thenReturn(ticket);
         when(ticketRepository.count()).thenReturn(4L);
-        when(ticketRepository.findAllSeatNo()).thenReturn(new ArrayList<>(Arrays.asList(3,4,5)));
+        when(ticketRepository.findAllSeatNo()).thenReturn(Arrays.asList(3,4,5));
+
         Ticket result= ticketService.purchaseTicket(ticket);
-        assertEquals(1,ticket.getSeatNo());
-        assertEquals("Section A",ticket.getSection());
-        assertNotNull(ticketService.purchaseTicket(ticket));
+
+        assertNotNull(ticketService.purchaseTicket(result));
+
+        assertEquals(1,result.getSeatNo());
+        assertEquals("Section A",result.getSection());
+
+
     }
 
 
     @Test
     void testAvailableSeats() {
-        when(ticketRepository.findAllSeatNo()).thenReturn(Arrays.asList(3,4,5));
-        assertEquals(Arrays.asList(1,2,6,7,8,9,10), ticketService.availableSeats());
+        List<Integer> bookedSeatsTest1 = Arrays.asList(3,4,5);
+        List<Integer> availableSeats = IntStream.iterate(1,n -> n+1)
+                .limit(TicketService.TRAIN_CAPACITY)
+                .filter(x -> !bookedSeatsTest1.contains(x))
+                .boxed()
+                .collect(Collectors.toList());
+
+        when(ticketRepository.findAllSeatNo()).thenReturn(bookedSeatsTest1);
+        assertEquals(availableSeats, ticketService.availableSeats());
+
+        List<Integer> bookedSeatsTest2 = Arrays.asList();
+        availableSeats = IntStream.iterate(1,n -> n+1)
+                .limit(TicketService.TRAIN_CAPACITY)
+                .filter(x -> !bookedSeatsTest2.contains(x))
+                .boxed()
+                .collect(Collectors.toList());
+
+        when(ticketRepository.findAllSeatNo()).thenReturn(Arrays.asList());
+
+        assertEquals(availableSeats, ticketService.availableSeats());
     }
 
     @Test
     void testAllocateSeat() {
-        when(ticketRepository.findAllSeatNo()).thenReturn(IntStream.iterate(1, n -> n + 1)
-                .limit(10).boxed().collect(Collectors.toList()));
+        when(ticketRepository.findAllSeatNo()).thenReturn(
+                IntStream.iterate(1, n -> n + 1)
+                .limit(TicketService.TRAIN_CAPACITY)
+                .boxed()
+                .collect(Collectors.toList()));
         assertThrows(CustomException.class, () -> ticketService.allocateSeat());
+
         when(ticketRepository.findAllSeatNo()).thenReturn(new ArrayList<>(Arrays.asList(3,4,5)));
         assertEquals(1,ticketService.allocateSeat());
+
+        when(ticketRepository.findAllSeatNo()).thenReturn(new ArrayList<>(Arrays.asList(1,4,5)));
+        assertEquals(2,ticketService.allocateSeat());
     }
 
     @Test
