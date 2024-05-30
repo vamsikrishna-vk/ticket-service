@@ -1,6 +1,8 @@
 package com.train_management.ticket_service.service;
 
-import com.train_management.ticket_service.exception.CustomException;
+
+import com.train_management.ticket_service.exception.SeatNotAvailableException;
+import com.train_management.ticket_service.exception.TicketNotFoundException;
 import com.train_management.ticket_service.model.Ticket;
 import com.train_management.ticket_service.repository.TicketRepository;
 import jakarta.transaction.Transactional;
@@ -35,8 +37,8 @@ public class TicketService {
     /**
      * Retrieve's ticket from DB by id.
      */
-    public Ticket viewTicket(Long id) {
-        return ticketRepository.findById(id).orElseThrow(()-> new CustomException("Ticket not found"));
+    public Ticket viewTicket(Long id) throws TicketNotFoundException{
+        return ticketRepository.findById(id).orElseThrow(()-> new TicketNotFoundException("Ticket not found with id "+id));
     }
 
     /**
@@ -71,10 +73,10 @@ public class TicketService {
     /**
      * Returns next available seat.
      */
-    public Integer allocateSeat(){
+    public Integer allocateSeat() throws SeatNotAvailableException{
 
         if(availableSeats().isEmpty()){
-            throw new CustomException("No seat left to allocate");
+            throw new SeatNotAvailableException("No seat left to allocate. Train is full");
         }
 
         return  availableSeats().get(0);
@@ -84,18 +86,18 @@ public class TicketService {
      * Modifies the seatNo and changes the section according to the seatNo.
      */
     @Transactional
-    public void modifySeat(Integer seatNo,long ticketId){
+    public void modifySeat(Integer seatNo,long ticketId) throws TicketNotFoundException,SeatNotAvailableException{
 
         if(availableSeats().contains(seatNo)){
             int updateSeatNo = ticketRepository.updateSeatNo(ticketId,seatNo);
             if(updateSeatNo==0){
-                throw new CustomException("Ticket not found");
+                throw new TicketNotFoundException("Ticket not found with id "+ticketId);
             }
             String sectionName = generateSectionStr(seatNo);
             ticketRepository.updateSection(ticketId,sectionName);
         }
         else {
-            throw new CustomException("seat already booked");
+            throw new SeatNotAvailableException("Seat "+seatNo+"is already booked");
         }
     }
 

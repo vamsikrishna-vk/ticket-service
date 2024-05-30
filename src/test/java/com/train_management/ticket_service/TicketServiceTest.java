@@ -1,6 +1,6 @@
 package com.train_management.ticket_service;
 
-import com.train_management.ticket_service.exception.CustomException;
+import com.train_management.ticket_service.exception.SeatNotAvailableException;
 import com.train_management.ticket_service.repository.TicketRepository;
 import com.train_management.ticket_service.service.TicketService;
 import com.train_management.ticket_service.model.Ticket;
@@ -79,7 +79,7 @@ public class TicketServiceTest {
                 .limit(TicketService.TRAIN_CAPACITY)
                 .boxed()
                 .collect(Collectors.toList()));
-        assertThrows(CustomException.class, () -> ticketService.allocateSeat());
+        assertThrows(SeatNotAvailableException.class, () -> ticketService.allocateSeat());
 
         when(ticketRepository.findAllSeatNo()).thenReturn(new ArrayList<>(Arrays.asList(3,4,5)));
         assertEquals(1,ticketService.allocateSeat());
@@ -97,6 +97,5 @@ public class TicketServiceTest {
         assertEquals("Section B",ticketService.generateSectionStr(6));
         assertEquals("Section B",ticketService.generateSectionStr(9));
     }
-
 
 }
