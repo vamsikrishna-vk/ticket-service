@@ -58,5 +58,15 @@ public class TicketServiceTest {
         assertEquals(1,ticketService.allocateSeat());
     }
 
+    @Test
+    void testGenerateSectionStr(){
+
+        assertEquals("Section A",ticketService.generateSectionStr(5));
+        assertEquals("Section A",ticketService.generateSectionStr(1));
+
+        assertEquals("Section B",ticketService.generateSectionStr(6));
+        assertEquals("Section B",ticketService.generateSectionStr(9));
+    }
+
 
 }
